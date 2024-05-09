@@ -20,4 +20,12 @@ export class PrismaProfileRepository implements ProfileRepository {
       },
     });
   }
+
+  findById(id: string): Promise<Profile> {
+    return this.prisma.profile.findUnique({
+      where: {
+        id,
+      },
+    });
+  }
 }

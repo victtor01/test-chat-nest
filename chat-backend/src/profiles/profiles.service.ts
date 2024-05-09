@@ -18,7 +18,12 @@ export class ProfilesService {
     return await this.profileRepo.create(profile);
   }
 
-  findByNickname(nickname: string): Promise<Profile> {
-    return this.profileRepo.findByNickname(nickname);
+  findById(profileId: string): Promise<Profile> {
+    return this.profileRepo.findById(profileId);
+  }
+  
+
+  async findByNickname(nickname: string): Promise<Profile> {
+    return await this.profileRepo.findByNickname(nickname);
   }
 }

@@ -21,7 +21,7 @@ export class UsersGateway {
   @WebSocketServer() server: Server;
   private logger: Logger = new Logger('USERS_GATEWAY');
 
-  @SubscribeMessage('send_message')
+  /* @SubscribeMessage('send_message')
   async sendMessage(
     client: Socket,
     data: { message: string; receiverId: string },
@@ -33,7 +33,7 @@ export class UsersGateway {
       receiverId: receiver.id,
       message: data.message,
     });
-  }
+  } */
 
   async emitNotification(userId: string, message: string): Promise<void> {
     try {

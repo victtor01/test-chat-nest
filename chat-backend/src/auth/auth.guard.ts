@@ -2,13 +2,14 @@ import {
   CanActivate,
   ExecutionContext,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { IS_PUBLIC_KEY } from 'src/config/constants';
 import { SECRET_KEY } from './constants/secret';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -22,40 +23,69 @@ export class AuthGuard implements CanActivate {
     return type === 'Bearer' ? token : undefined;
   } */
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
-      context.getHandler(),
-      context.getClass(),
-    ]);
+  private logger: Logger = new Logger('AUTH_GUARD');
 
-    if (isPublic) {
-      return true;
-    }
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const isPublic: boolean = this.reflector.getAllAndOverride<boolean>(
+      IS_PUBLIC_KEY,
+      [context.getHandler(), context.getClass()],
+    );
+
+    if (isPublic) return true;
 
     const request = context.switchToHttp().getRequest();
-    const response = context.switchToHttp().getResponse();
+    const response: Response = context.switchToHttp().getResponse();
 
     const token = request?.cookies?.['access_token'] || null;
+    const refresh_token = request?.cookies?.['refresh_token'] || null;
 
-    if (!token) {
-      throw new UnauthorizedException('passport não está presente!');
+    if (!token || !refresh_token) {
+      throw new UnauthorizedException('passports não estão presentes!');
     }
 
     try {
+      // try get payload
+
       const payload = await this.jwtService.verifyAsync(token, {
         secret: SECRET_KEY,
       });
 
+      // returns user with payload
+
       request['user'] = payload;
     } catch {
+      try {
+        // get payload of refresh_token
 
-      console.log('tentando atualizar')
+        const payload = this.jwtService.decode(token);
 
-      console.log(request?.cookies?.['refresh_token'])
+        // get payload of refresh_token and verify
 
-      throw new UnauthorizedException({
-        message: 'houve um erro ao tentar autenticar',
-      });
+        const refresh_payload =
+          await this.jwtService.verifyAsync(refresh_token);
+
+        // create new access_token and set in cookies
+
+        const access_token = await this.jwtService.signAsync({
+          id: refresh_payload.id,
+          name: refresh_payload.name,
+          email: refresh_payload.email,
+          profile: payload.profile,
+        });
+
+        response.cookie('access_token', access_token, {
+          httpOnly: true,
+          sameSite: 'strict',
+          path: '/',
+        });
+
+        request['user'] = payload;
+      } catch (error) {
+        this.logger.error(error);
+        throw new UnauthorizedException({
+          message: 'houve um erro ao tentar autenticar',
+        });
+      }
     }
 
     return true;

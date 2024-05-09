@@ -25,9 +25,27 @@ model User {
   sentFriendRequests     FriendRequest[] @relation("sender")
   receivedFriendRequests FriendRequest[] @relation("receiver")
 
+  sendMessages     PrivateMessage[] @relation("sender")
+  receivedMessages PrivateMessage[] @relation("receiver")
+
   profile Profile?
 
   @@map("users")
+}
+
+model PrivateMessage {
+  id      String @id @unique @default(uuid())
+  message String
+
+  senderId   String
+  sender     User   @relation("sender", fields: [senderId], references: [id])
+  receiverId String
+  receiver   User   @relation("receiver", fields: [receiverId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("private_messages")
 }
 
 model Profile {
@@ -39,6 +57,8 @@ model Profile {
 
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
+
+  @@map("profiles")
 }
 
 model FriendRequest {

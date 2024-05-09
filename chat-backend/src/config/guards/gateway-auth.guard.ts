@@ -12,6 +12,19 @@ import { RedisService } from 'src/redis/redis.service';
 
 //const token = this.extractTokenFromHeader(client.handshake.auth.passport);
 
+export type ClientDataHeader = {
+  profileId: string;
+  socket: string;
+  id: string;
+};
+
+export type ClientRedisData = {
+  profileId: string;
+  socket: string;
+  name: string;
+  id: string;
+};
+
 @Injectable()
 export class WebSocketAuthGuard implements CanActivate {
   constructor(
@@ -24,8 +37,10 @@ export class WebSocketAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const client = context.switchToWs().getClient();
 
+    console.log(client.handshake);
     // cookies parter to get access_token
     cookieParser()(client.handshake, null, () => {});
+
 
     const token: string | null =
       client.handshake?.cookies?.access_token || null;
@@ -37,15 +52,16 @@ export class WebSocketAuthGuard implements CanActivate {
       const decoded = await this.jwtService.verifyAsync(token);
 
       await this.redis.save(decoded.id, {
-        profileId: decoded.profileId, // add new profile id
+        profileId: decoded.profile.id, // add new profile id
         name: decoded.name,
         socket: client.id,
         id: decoded.id,
       });
 
       client.handshake.headers.user = {
-        id: decoded.id,
+        profileId: decoded.profileId,
         socket: client.id,
+        id: decoded.id,
       };
 
       return true;

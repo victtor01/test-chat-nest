@@ -23,14 +23,6 @@ import { ProfilesModule } from './profiles/profiles.module';
     AuthModule,
     UsersModule,
     RedisModule,
-    CacheModule.register({
-      host: 'http://localhost',
-      port: '6379',
-      auth_pass: 'admin',
-      isGlobal: true,
-      ttl: 30000,
-      no_ready_check: true,
-    }),
     FriendsModule,
     MessagesModule,
     ProfilesModule,
@@ -47,4 +39,14 @@ import { ProfilesModule } from './profiles/profiles.module';
   ],
   exports: [RedisService],
 })
+
 export class AppModule {}
+
+/* CacheModule.register({
+  host: 'http://localhost',
+  port: '6379',
+  auth_pass: 'admin',
+  isGlobal: true,
+  ttl: 30000,
+  no_ready_check: true,
+}), */

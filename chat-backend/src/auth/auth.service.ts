@@ -10,6 +10,7 @@ import { AuthDto } from './dtos/auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { RedisService } from 'src/redis/redis.service';
 import { Response } from 'express';
+import { ProfilesService } from 'src/profiles/profiles.service';
 
 type AuthResponse = {
   access_token: string;
@@ -22,10 +23,13 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly redis: RedisService,
+    private readonly profileService: ProfilesService,
   ) {}
 
   async auth(body: AuthDto, response: Response): Promise<AuthResponse> {
     try {
+      // auth user with password
+
       const userdb =
         (await this.usersService.findOneByEmail(body?.email)) || null;
 
@@ -36,6 +40,19 @@ export class AuthService {
 
       if (!comparePassword) throw new UnauthorizedException('senha incorreta!');
 
+      // if user not have profile | create
+
+      const word = userdb?.id.substring(0, 4);
+
+      if (!userdb?.profile?.id) {
+        const profile = await this.profileService.create({
+          createProfileDto: { nickname: `user-${word}` },
+          userId: userdb.id,
+        });
+
+        userdb.profile = profile;
+      }
+
       const access_token = await this.jwtService.signAsync({
         id: userdb.id,
         name: userdb.name,
@@ -43,11 +60,17 @@ export class AuthService {
         profile: userdb.profile,
       });
 
-      const refresh_token = await this.jwtService.signAsync({
-        id: userdb.id,
-        name: userdb.name,
-        email: userdb.email,
-      });
+      const refresh_token = await this.jwtService.signAsync(
+        {
+          id: userdb.id,
+          name: userdb.name,
+          email: userdb.email,
+          profile: userdb.profile,
+        },
+        {
+          expiresIn: '4d',
+        },
+      );
 
       response.cookie('access_token', access_token, {
         httpOnly: true,

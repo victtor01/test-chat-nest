@@ -8,11 +8,13 @@ import { SECRET_KEY } from './constants/secret';
 import { constantsJWT } from './constants';
 import { RedisService } from 'src/redis/redis.service';
 import { RedisModule } from 'src/redis/redis.module';
+import { ProfilesModule } from 'src/profiles/profiles.module';
 
 @Module({
   imports: [
     RedisModule,
     UsersModule,
+    ProfilesModule,
     JwtModule.register({
       global: true,
       secret: SECRET_KEY,
