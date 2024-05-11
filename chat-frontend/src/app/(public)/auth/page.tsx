@@ -55,7 +55,21 @@ const Auth = () => {
   } = useAuth();
   return (
     <>
-      <header className="w-full flex justify-between p-10">
+      <div className="fixed">
+        <div
+          className="w-[120vh] h-[120vh] bg-gradient-45 from-purple-500 to-indigo-500 
+        rotate-45 translate-x-[-70vh]
+        translate-y-[-20rem] z-[-1] rounded-[30%]"
+        />
+      </div>
+      <div className="fixed right-0 top-0 ">
+        <div
+          className="w-[120vh] h-[120vh] bg-gradient-45 from-purple-500 to-indigo-500 
+        rotate-45 translate-x-[70vh] translate-y-[30rem] z-[-1] rounded-[40%]"
+        />
+      </div>
+ 
+      <header className="w-full flex justify-between p-10 z-10">
         <div></div>
         <div
           className="flex gap-3 items-center font-semibold
@@ -73,8 +87,8 @@ const Auth = () => {
       </header>
       <form
         onSubmit={handleSubmit(auth)}
-        className="flex flex-col p-10 gap-5 m-auto shadow-2xl shadow-blue-50 bg-white
-      w-full max-w-[28rem] rounded-2xl"
+        className="flex flex-col p-10 gap-5 m-auto shadow bg-white
+      w-full max-w-[28rem] rounded-2xl z-10"
       >
         <header className={`${fontValela}`}>
           <h1 className="font-semibold text-2xl text-gray-800">
@@ -87,8 +101,8 @@ const Auth = () => {
             <input
               type="text"
               id="email"
-              className="border rounded-lg p-2
-            bg-zinc-50 outline-indigo-400"
+              className="rounded-lg p-2
+              bg-white outline-indigo-400 border"
               placeholder="example@gmail.com"
               {...register("email")}
             />
@@ -98,8 +112,8 @@ const Auth = () => {
             <input
               type="text"
               id="password"
-              className="border rounded-lg p-2
-            bg-zinc-50 outline-indigo-400"
+              className="rounded-lg p-2
+              bg-white outline-indigo-400 border"
               placeholder="••••••••••"
               {...register("password")}
             />
@@ -116,8 +130,8 @@ const Auth = () => {
         </section>
         <footer className="w-full flex">
           <button
-            className="p-3 w-full shadow-xl bg-indigo-600
-            hover:opacity-100 text-white rounded-xl opacity-90"
+            className="p-3 w-full bg-indigo-600 hover:text-white hover:shadow-xl
+            font-semibold hover:opacity-100 rounded-xl opacity-90 text-gray-100"
           >
             Entrar
           </button>

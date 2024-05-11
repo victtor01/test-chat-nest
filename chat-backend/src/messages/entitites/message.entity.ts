@@ -1,29 +1,32 @@
+import { Conversation } from 'src/conversations/entities/conversation.entity';
 import { User } from 'src/users/entities/user.entity';
 
 export class Message {
   id: string;
-  message: string;
-  senderId: string;
-  receiverId: string;
+  text: string;
 
-  sender: User;
-  receiver: User;
+  conversationId: string;
+  conversation?: Conversation;
+
+  senderId: string;
+  sender?: Partial<User>;
 
   createdAt: Date;
   updatedAt: Date;
 }
 
 /* 
-  id      String @id @unique @default(uuid())
-  message String
+  id   String @id @unique @default(uuid())
+  text String
 
-  senderId   String
-  sender     User   @relation("sender", fields: [senderId], references: [id])
-  receiverId String
-  receiver   User   @relation("receiver", fields: [receiverId], references: [id])
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  senderId String
+  sender   User   @relation(fields: [senderId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("private_messages")
+  @@map("messages")
 */

@@ -7,7 +7,6 @@ import { UsersGateway } from './users.gateway';
 import { FriendsService } from 'src/friends/friends.service';
 import { send } from 'process';
 import { FriendRequest } from '@prisma/client';
-import { ProfilesService } from 'src/profiles/profiles.service';
 
 @Injectable()
 export class UsersService {
@@ -15,7 +14,6 @@ export class UsersService {
     private readonly usersRepo: UsersRepository,
     private readonly usersGateway: UsersGateway,
     private readonly friendsService: FriendsService,
-    private readonly profilesService: ProfilesService,
   ) {}
 
   private logger: Logger = new Logger('USER_SERVICE');
@@ -25,25 +23,18 @@ export class UsersService {
     return await bcrypt.hash(password, this.salt);
   }
 
+  findOneByEmail(email: string): Promise<User> {
+    return this.usersRepo.findOneByEmail(email);
+  }
+
   async create(body: CreateUserDto): Promise<Omit<User, 'id' | 'password'>> {
     body.password = await this.bcryptPass(body.password);
 
     const createdUser = await this.usersRepo.create(body);
 
-    await this.profilesService.create({
-      userId: createdUser.id,
-      createProfileDto: {
-        nickname: createdUser.name,
-      },
-    });
-
     const { id, password, ...props } = createdUser;
 
     return props;
-  }
-
-  findOneByEmail(email: string): Promise<User> {
-    return this.usersRepo.findOneByEmail(email);
   }
 
   async allFriends(userId: string): Promise<Partial<User>> {
@@ -55,10 +46,9 @@ export class UsersService {
   async addFriend(sender: string, nickname: string): Promise<any> {
     try {
       // get user of nickname
-      const ReceiverProfile =
-        await this.profilesService.findByNickname(nickname);
+      const ReceiverProfile = await this.usersRepo.findByNickname(nickname);
 
-      const receiverId = ReceiverProfile.userId;
+      const receiverId = ReceiverProfile.id;
 
       console.log(receiverId);
 
@@ -72,6 +62,7 @@ export class UsersService {
       });
 
       // create new friendRequest
+
       await this.friendsService.create({
         senderId: sender,
         receiverId: receiverId,

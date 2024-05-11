@@ -8,9 +8,11 @@ import { UsersModule } from 'src/users/users.module';
 import { UsersService } from 'src/users/users.service';
 import { RedisService } from 'src/redis/redis.service';
 import { RedisModule } from 'src/redis/redis.module';
+import { ConversationsService } from 'src/conversations/conversations.service';
+import { ConversationsModule } from 'src/conversations/conversations.module';
 
 @Module({
-  imports: [forwardRef(() => UsersModule)],
+  imports: [forwardRef(() => UsersModule), ConversationsModule],
   providers: [
     FriendsService,
     PrismaService,

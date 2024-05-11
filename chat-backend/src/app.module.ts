@@ -2,11 +2,6 @@ import { Module } from '@nestjs/common';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { AppGateway } from './app.gateway';
-import {
-  CacheModule,
-  CacheModuleAsyncOptions,
-  CacheStore,
-} from '@nestjs/cache-manager';
 import { AppController } from './app.controller';
 import { redisStore } from 'cache-manager-redis-store';
 import { RedisService } from './redis/redis.service';
@@ -16,7 +11,7 @@ import { AuthGuard } from './auth/auth.guard';
 import { FriendsModule } from './friends/friends.module';
 import { ServiceService } from './service/service.service';
 import { MessagesModule } from './messages/messages.module';
-import { ProfilesModule } from './profiles/profiles.module';
+import { ConversationsModule } from './conversations/conversations.module';
 
 @Module({
   imports: [
@@ -25,7 +20,7 @@ import { ProfilesModule } from './profiles/profiles.module';
     RedisModule,
     FriendsModule,
     MessagesModule,
-    ProfilesModule,
+    ConversationsModule,
   ],
   controllers: [AppController],
   providers: [

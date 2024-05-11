@@ -61,7 +61,7 @@ const AddFriend = () => {
         <section className="flex flex-col gap-4">
           <label htmlFor="link" className="flex flex-col gap-1">
             <span className="text-gray-500 text-md font-semibold">
-              Digite o código abaixo!
+              Digite o nickname do perfil abaixo.
             </span>
             <input
               type="text"
@@ -70,7 +70,7 @@ const AddFriend = () => {
               onChange={handleUserId}
               className="w-full p-2 border outline-indigo-500 
               rounded-lg shadow-xl shadow-gray-50"
-              placeholder="0000-0000-0000-0000"
+              placeholder="example-3g52"
             />
           </label>
           <button

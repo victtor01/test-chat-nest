@@ -10,6 +10,8 @@ import { JwtService } from '@nestjs/jwt';
 import { IS_PUBLIC_KEY } from 'src/config/constants';
 import { SECRET_KEY } from './constants/secret';
 import { Request, Response } from 'express';
+import { User } from 'src/users/entities/user.entity';
+import { TokenPayload } from './auth.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -66,12 +68,15 @@ export class AuthGuard implements CanActivate {
 
         // create new access_token and set in cookies
 
-        const access_token = await this.jwtService.signAsync({
+        const PayloadAccessToken: Partial<TokenPayload> = {
           id: refresh_payload.id,
           name: refresh_payload.name,
           email: refresh_payload.email,
-          profile: payload.profile,
-        });
+          profileId: refresh_payload?.profileId,
+        };
+
+        const access_token =
+          await this.jwtService.signAsync(PayloadAccessToken);
 
         response.cookie('access_token', access_token, {
           httpOnly: true,

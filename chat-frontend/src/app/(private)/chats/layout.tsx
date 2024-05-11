@@ -10,13 +10,17 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   return (
     <div className="flex w-full h-screen">
-      <nav
-        className="w-full max-w-[18rem] bg-zinc-900 h-full 
-      border-r border-gray-800 z-40"
+      <div
+        className="w-full max-w-[22rem] bg-white h-full z-40"
       >
         <Sidebar />
-      </nav>
-      <div className="w-full h-auto flex flex-col relative">{children}</div>
+      </div>
+      <section
+        className="w-full h-auto flex 
+        flex-col relative"
+      >
+        {children}
+      </section>
     </div>
   );
 }

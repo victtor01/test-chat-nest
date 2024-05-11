@@ -8,10 +8,9 @@ import { PrismaUsersRepository } from './repositories/implements/prisma-users-re
 import { RedisModule } from 'src/redis/redis.module';
 import { FriendsModule } from 'src/friends/friends.module';
 import { FriendsRepository } from 'src/friends/repositories/friends-repository';
-import { ProfilesModule } from 'src/profiles/profiles.module';
 
 @Module({
-  imports: [RedisModule, FriendsModule, ProfilesModule],
+  imports: [RedisModule, FriendsModule],
   providers: [
     UsersGateway,
     UsersService,

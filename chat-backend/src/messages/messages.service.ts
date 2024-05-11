@@ -1,32 +1,42 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { ProfilesService } from 'src/profiles/profiles.service';
 import { RedisService } from 'src/redis/redis.service';
 import { UsersService } from 'src/users/users.service';
 import { MessagesGateway } from './messages.gateway';
+import { ConversationsService } from 'src/conversations/conversations.service';
+import { CreateMessageDto } from './dtos/create-message.dto';
+import { Message } from './entitites/message.entity';
+import { MessagesRepository } from './repositories/messages-repository';
 
 @Injectable()
 export class MessagesService {
   constructor(
-    private readonly profilesService: ProfilesService,
+    private readonly messagesRepo: MessagesRepository,
     private readonly messagesGateway: MessagesGateway,
+    private readonly conversationsService: ConversationsService,
   ) {}
 
-  async send(senderId: string, receiverProfileId: string, message: string) {
+  async store(data: CreateMessageDto): Promise<Message> {
+    return this.messagesRepo.store(data);
+  }
+
+  async send(senderId: string, chatId: string, message: string) {
     // get profileId of sender
-    const receiver = await this.profilesService.findById(receiverProfileId);
-
-    if (!receiver?.userId) throw new BadRequestException('receiver not found');
-
-    const { userId: receiverId } = receiver;
-
-    //const dataReceiver = await this.redis.get<any>(receiverId);
-    
-    // post in database message
-
-    await this.messagesGateway.sendMessage({
-      senderId,
-      receiverId,
-      message,
+    const conversation = await this.conversationsService.findFull({
+      userId: senderId,
+      conversationId: chatId,
     });
+
+    console.log(conversation);
+
+    if (!conversation?.users?.some((user) => user.id === senderId))
+      throw new BadRequestException('receiver not found');
+
+    const messageCreated = await this.store({
+      conversationId: conversation.id,
+      text: message,
+      senderId,
+    });
+
+    await this.messagesGateway.sendMessage(messageCreated);
   }
 }

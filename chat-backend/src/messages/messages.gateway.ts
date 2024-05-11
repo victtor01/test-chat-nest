@@ -1,22 +1,19 @@
+import { RedisService } from 'src/redis/redis.service';
 import { UseGuards } from '@nestjs/common';
-import {
-  SubscribeMessage,
-  WebSocketGateway,
-  WebSocketServer,
-} from '@nestjs/websockets';
 import { Server } from 'socket.io';
+import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import {
   ClientRedisData,
   WebSocketAuthGuard,
 } from 'src/config/guards/gateway-auth.guard';
-import { RedisService } from 'src/redis/redis.service';
+import { Message } from './entitites/message.entity';
 
-type DataMessage = {
+/* type ISendMessage = {
   senderId: string;
-  receiverId: string;
-  message: string;
+  chatId: string;
+  body: string;
 };
-
+ */
 @UseGuards(WebSocketAuthGuard)
 @WebSocketGateway({
   cors: {
@@ -28,18 +25,14 @@ export class MessagesGateway {
 
   @WebSocketServer() server: Server;
 
-  async sendMessage(data: DataMessage): Promise<void> {
+  async sendMessage(data: Message): Promise<void> {
+    /*   
     const receiver =
       (await this.redis.get<ClientRedisData>(data.receiverId)) || null;
     const sender =
       (await this.redis.get<ClientRedisData>(data.senderId)) || null;
-    
-    if (receiver?.socket && sender?.profileId) {
-      this.server.to(receiver?.socket).emit(sender?.profileId, {
-        senderId: sender.id,
-        receiverId: receiver.id,
-        message: data.message,
-      });
-    }
+    */
+
+    this.server.to(data.conversationId).emit('message', data);
   }
 }

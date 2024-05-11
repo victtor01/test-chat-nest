@@ -9,11 +9,11 @@ export class MessagesController {
   @Post()
   send(
     @Req() req: { user: User },
-    @Body() body: { receiverProfileId: string; message: string },
+    @Body() body: { chatId: string; message: string },
   ) {
     return this.messagesService.send(
       req.user.id,
-      body.receiverProfileId,
+      body.chatId,
       body.message,
     );
   }

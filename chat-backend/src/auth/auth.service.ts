@@ -10,12 +10,18 @@ import { AuthDto } from './dtos/auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { RedisService } from 'src/redis/redis.service';
 import { Response } from 'express';
-import { ProfilesService } from 'src/profiles/profiles.service';
 
 type AuthResponse = {
   access_token: string;
   refresh_token: string;
 };
+
+export interface TokenPayload {
+  id: string;
+  name: string;
+  email: string;
+  profileId: string;
+}
 
 @Injectable()
 export class AuthService {
@@ -23,7 +29,6 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
     private readonly redis: RedisService,
-    private readonly profileService: ProfilesService,
   ) {}
 
   async auth(body: AuthDto, response: Response): Promise<AuthResponse> {
@@ -40,24 +45,11 @@ export class AuthService {
 
       if (!comparePassword) throw new UnauthorizedException('senha incorreta!');
 
-      // if user not have profile | create
-
-      const word = userdb?.id.substring(0, 4);
-
-      if (!userdb?.profile?.id) {
-        const profile = await this.profileService.create({
-          createProfileDto: { nickname: `user-${word}` },
-          userId: userdb.id,
-        });
-
-        userdb.profile = profile;
-      }
-
       const access_token = await this.jwtService.signAsync({
         id: userdb.id,
         name: userdb.name,
         email: userdb.email,
-        profile: userdb.profile,
+        profileId: userdb.profileId,
       });
 
       const refresh_token = await this.jwtService.signAsync(
@@ -65,7 +57,7 @@ export class AuthService {
           id: userdb.id,
           name: userdb.name,
           email: userdb.email,
-          profile: userdb.profile,
+          profileId: userdb.profileId,
         },
         {
           expiresIn: '4d',
@@ -84,10 +76,17 @@ export class AuthService {
         path: '/',
       });
 
+      const profile: Partial<{ nickname: string; id: string }> = {
+        nickname: userdb?.nickname,
+        id: userdb?.profileId,
+      };
+
+      response.cookie('profile', JSON.stringify(profile));
+
       await this.redis.save(
         userdb.id,
         JSON.stringify({
-          profileId: userdb.profile.id,
+          profileId: userdb.profileId,
           id: userdb.id,
         }),
       );

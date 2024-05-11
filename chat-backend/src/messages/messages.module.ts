@@ -4,11 +4,22 @@ import { MessagesService } from './messages.service';
 import { MessagesGateway } from './messages.gateway';
 import { RedisModule } from 'src/redis/redis.module';
 import { RedisService } from 'src/redis/redis.service';
-import { ProfilesModule } from 'src/profiles/profiles.module';
+import { ConversationsModule } from 'src/conversations/conversations.module';
+import { PrismaService } from 'src/database/prisma.service';
+import { MessagesRepository } from './repositories/messages-repository';
+import PrismaMessagesRepository from './repositories/implements/prisma-messages-repository';
 
 @Module({
-  imports: [RedisModule, ProfilesModule],
+  imports: [RedisModule, ConversationsModule],
   controllers: [MessagesController],
-  providers: [MessagesService, MessagesGateway, RedisService],
+  providers: [
+    MessagesService,
+    MessagesGateway,
+    PrismaService,
+    {
+      provide: MessagesRepository,
+      useClass: PrismaMessagesRepository,
+    },
+  ],
 })
 export class MessagesModule {}

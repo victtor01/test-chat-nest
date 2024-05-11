@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as cookieParser from 'cookie-parser';
+import { TokenPayload } from 'src/auth/auth.service';
 import { RedisService } from 'src/redis/redis.service';
 
 //const token = this.extractTokenFromHeader(client.handshake.auth.passport);
@@ -37,10 +38,9 @@ export class WebSocketAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const client = context.switchToWs().getClient();
 
-    console.log(client.handshake);
+    /* console.log(client.handshake); */
     // cookies parter to get access_token
     cookieParser()(client.handshake, null, () => {});
-
 
     const token: string | null =
       client.handshake?.cookies?.access_token || null;
@@ -49,10 +49,12 @@ export class WebSocketAuthGuard implements CanActivate {
       throw new UnauthorizedException('não foi encontrado um passport!');
 
     try {
-      const decoded = await this.jwtService.verifyAsync(token);
+      const decoded: TokenPayload = await this.jwtService.verifyAsync(token);
+
+      //this.logger.warn(decoded);
 
       await this.redis.save(decoded.id, {
-        profileId: decoded.profile.id, // add new profile id
+        profileId: decoded.profileId, // add new profile id
         name: decoded.name,
         socket: client.id,
         id: decoded.id,

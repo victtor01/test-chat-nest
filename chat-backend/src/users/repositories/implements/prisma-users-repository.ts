@@ -19,9 +19,6 @@ export class PrismaUsersRepository implements UsersRepository {
       where: {
         email,
       },
-      include: {
-        profile: true,
-      },
     });
   }
 
@@ -33,16 +30,30 @@ export class PrismaUsersRepository implements UsersRepository {
       select: {
         friends: {
           select: {
+            nickname: true,
+            profileId: true,
             name: true,
-            profile: {
-              select: {
-                id: true,
-                nickname: true,
+            conversations: {
+              where: {
+                isGroup: false,
+                users: {
+                  some: {
+                    id: {
+                      in: [userId],
+                    },
+                  },
+                },
               },
             },
           },
         },
       },
+    });
+  }
+
+  findByNickname(nickname: string): Promise<User> {
+    return this.prisma.user.findUnique({
+      where: { nickname },
     });
   }
 

@@ -8,9 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 export default function Layout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     socket.connect();
-
-    socket.emit("connection");
-
+    /* socket.emit("connection"); */
     socket.on("notifications", (data) => {
       console.log(data);
       toast(data);
@@ -23,7 +21,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <main className="flex flex-col w-full h-screen overflow-auto bg-gradient-45 from-purple-50 to-indigo-50">
+    <main className="flex flex-col w-full h-screen overflow-auto bg-white">
       {children}
       <ToastContainer
         position="top-right"

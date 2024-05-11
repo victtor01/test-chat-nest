@@ -14,10 +14,12 @@ datasource db {
 }
 
 model User {
-  id       String @id @unique @default(uuid())
-  name     String
-  email    String @unique
-  password String
+  id        String @id @unique @default(uuid())
+  profileId String @unique @default(uuid())
+  nickname  String @unique
+  name      String
+  email     String @unique
+  password  String
 
   friends  User[] @relation("friends")
   friendOf User[] @relation("friends")
@@ -25,40 +27,38 @@ model User {
   sentFriendRequests     FriendRequest[] @relation("sender")
   receivedFriendRequests FriendRequest[] @relation("receiver")
 
-  sendMessages     PrivateMessage[] @relation("sender")
-  receivedMessages PrivateMessage[] @relation("receiver")
-
-  profile Profile?
+  conversations Conversation[]
+  Message       Message[]
 
   @@map("users")
 }
 
-model PrivateMessage {
-  id      String @id @unique @default(uuid())
-  message String
-
-  senderId   String
-  sender     User   @relation("sender", fields: [senderId], references: [id])
-  receiverId String
-  receiver   User   @relation("receiver", fields: [receiverId], references: [id])
+model Conversation {
+  id      String   @id @unique @default(uuid())
+  isGroup Boolean? @default(false)
+  name    String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@map("private_messages")
+  messages Message[]
+  users    User[]
 }
 
-model Profile {
-  id       String @id @unique @default(uuid())
-  nickname String @unique
+model Message {
+  id   String @id @unique @default(uuid())
+  text String
+
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  senderId String
+  sender   User   @relation(fields: [senderId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id])
-
-  @@map("profiles")
+  @@map("messages")
 }
 
 model FriendRequest {
@@ -66,8 +66,8 @@ model FriendRequest {
   senderId   String
   receiverId String
 
-  sender   User @relation("sender", fields: [senderId], references: [id])
-  receiver User @relation("receiver", fields: [receiverId], references: [id])
+  sender   User @relation("sender", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver User @relation("receiver", fields: [receiverId], references: [id], onDelete: Cascade)
 
   @@map("friend_requests")
 }

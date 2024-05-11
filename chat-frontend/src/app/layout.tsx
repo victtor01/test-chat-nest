@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { fontValela } from "@/fonts";
 import { ReactQueryProvider } from "@/components/query-provider";
+/* import dayjs from "dayjs"; */
+/* import 'dayjs/locale/pt-br' */
+/* dayjs.locale("pt-br"); */
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -16,9 +19,7 @@ export default function RootLayout({
   return (
     <ReactQueryProvider>
       <html lang="pt-br">
-        <body className={`${fontValela}`}>
-          {children}
-        </body>
+        <body className={`${fontValela}`}>{children}</body>
       </html>
     </ReactQueryProvider>
   );

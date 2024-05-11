@@ -39,12 +39,54 @@ body {
 
 .offon::before {
   position: absolute;
-  content: '';
+  content: "";
   width: 0.6rem;
   height: 0.6rem;
   border-radius: 100%;
   top: 0rem;
   right: 0rem;
 
-  @apply shadow
+  @apply shadow;
+}
+
+.paper-shadow {
+  position: relative;
+}
+
+.paper-shadow:before {
+  z-index: -1;
+  position: absolute;
+  content: "";
+  bottom: 15px;
+  left: 12px;
+  width: 45%;
+  height: 20px;
+  background: #777;
+  -webkit-box-shadow: 0 15px 19px #aaa;
+  -moz-box-shadow: 0 15px 19px #aaa;
+  box-shadow: 0 15px 19px #aaa;
+  -webkit-transform: rotate(-3deg);
+  -moz-transform: rotate(-3deg);
+  -o-transform: rotate(-3deg);
+  -ms-transform: rotate(-3deg);
+  transform: rotate(-3deg);
+}
+
+.paper-shadow:after {
+  z-index: -1;
+  position: absolute;
+  content: "";
+  bottom: 15px;
+  right: 12px;
+  width: 45%;
+  height: 20px;
+  background: #777;
+  -webkit-box-shadow: 0 15px 19px #aaa;
+  -moz-box-shadow: 0 15px 19px #aaa;
+  box-shadow: 0 15px 19px #aaa;
+  -webkit-transform: rotate(3deg);
+  -moz-transform: rotate(3deg);
+  -o-transform: rotate(3deg);
+  -ms-transform: rotate(3deg);
+  transform: rotate(3deg);
 }
